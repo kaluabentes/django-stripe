@@ -8,7 +8,7 @@ from .models import Order
 class OrderTestCase(TestCase):
     ORDER_PAYLOAD = {
         "user": 1,
-        "user_credit_card": 3,
+        "credit_card": 3,
         "products": [
             {
                 "id": 1,
