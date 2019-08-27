@@ -11,7 +11,7 @@ def get_order_title(order_id, user):
 
 class BaseProduct(models.Model):
     title = models.CharField(max_length=50)
-    description = models.TextField(max_length=50)
+    description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
     class Meta:
@@ -19,6 +19,7 @@ class BaseProduct(models.Model):
 
 
 class Option(BaseProduct):
+    price = models.DecimalField(max_digits=6, decimal_places=2, blank=True)
     chargeable = models.BooleanField(default=False)
     
     def __str__(self):
@@ -49,7 +50,9 @@ class Order(models.Model):
 
     create_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=DEFAULT_STATUS)
     products = models.ManyToManyField(Product)
 
@@ -57,15 +60,15 @@ class Order(models.Model):
         return get_order_title(self.id, self.user)
 
 
-class UserCreditCard(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    fast_name = models.CharField(max_length=50)
-    cpf = models.CharField(max_length=11)
+class CreditCard(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    name = models.CharField(max_length=150)
     number = models.CharField(max_length=16)
     exp_date = models.CharField(max_length=5)
     flag = models.CharField(max_length=50, null=True, blank=True)
-    
+    customer_id = models.CharField(max_length=50)
+
     def __str__(self):
         return str(self.flag) + " ****" + self.number[:4]
 
@@ -78,11 +81,14 @@ class SupportedDistrict(models.Model):
 
 
 class Payment(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    user_credit_card = models.ForeignKey(UserCreditCard, on_delete=models.SET_NULL, null=True)
     create_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+
+    method = models.CharField(max_length=150)
     value = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
-        return get_order_title(self.order.id, self.user_credit_card.user)
+        return get_order_title(self.order.id, self.order.user)
+
