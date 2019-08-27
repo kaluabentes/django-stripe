@@ -24,13 +24,13 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 class OrderView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(OrderView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def sum_options_prices(self, options):
         def sum_option_price(total, option):
             op = Option.objects.get(id=option['id'])
             if op.chargeable:
-                return total + (option['quantity'] * op.price)
+                return total + (option.get('quantity', 0) * op.price)
             return total
 
         return reduce(sum_option_price, options, 0)
@@ -83,7 +83,7 @@ class OrderView(View):
 class CreditCardView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(CreditCardView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request):
         body = parse_body(request)
