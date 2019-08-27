@@ -37,9 +37,9 @@ class OrderView(View):
 
     def sum_products_prices(self, products):
         def sum_product_price(total, product):
-            return total + self.sum_options_prices(product['options']) + product['instance'].price
+            return total + float(self.sum_options_prices(product['options'])) + float(product['instance'].price)
 
-        return float(reduce(sum_product_price, products, 0))
+        return reduce(sum_product_price, products, 0)
 
     def format_price(self, price):
         return int(round(price * 100, 0))
