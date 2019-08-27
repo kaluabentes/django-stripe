@@ -16,15 +16,16 @@ from app.models import Product
 from app.models import CreditCard
 from app.models import Payment
 from app.models import Option
+from app.models import OptionSection
 
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
 
-class OrderView(View):
+class OrdersView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(OrderView, self).dispatch(request, *args, **kwargs)
+        return super(OrdersView, self).dispatch(request, *args, **kwargs)
 
     def sum_options_prices(self, options):
         def sum_option_price(total, option):
@@ -80,10 +81,10 @@ class OrderView(View):
         return JsonResponse(response, status=201)
 
 
-class CreditCardView(View):
+class CreditCardsView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(CreditCardView, self).dispatch(request, *args, **kwargs)
+        return super(CreditCardsView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
         body = parse_body(request)
@@ -118,3 +119,31 @@ class CreditCardView(View):
         }
 
         return JsonResponse(response, status=201)
+
+
+class ProductsView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ProductsView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        products = Product.objects.all()
+        serialized_products = list(products.values())
+
+        def get_product_options(product):
+            option_sections = OptionSection.objects.filter(
+                product=product['id'])
+            options = []
+
+            def map_option(option):
+                return {'title': option.title, 'price': float(option.price)}
+
+            for section in option_sections:
+                options.append(
+                    {'title': section.title, 'options': list(map(map_option, list(section.options.all())))})
+
+            return {**product, 'price': float(product['price']), 'option_sections': options}
+
+        response = map(get_product_options, serialized_products)
+
+        return JsonResponse(list(response), status=200, safe=False)
