@@ -1,0 +1,8 @@
+{
+  "order_status_steps": [
+    ["RECEIVED", "Received"],
+    ["ACCEPTED", "Accepted"],
+    ["FINISHED", "Finished"],
+    ["DELIVERED", "Delivered"]
+  ]
+}
