@@ -1,6 +1,6 @@
-# Orderspot
+# Django Stripe Challengue
 
-An application to handle online ordering for restaurants and delivery establishments.
+A simple Django app that demonstrates how to integrate with Stripe API
 
 ## Requirements
 
