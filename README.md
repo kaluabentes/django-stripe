@@ -1,4 +1,4 @@
-# Django Stripe Challengue
+# Django Stripe
 
 A simple Django app that demonstrates how to integrate with Stripe API
 
